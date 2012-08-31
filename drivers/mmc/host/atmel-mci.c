@@ -480,7 +480,14 @@ err:
 static inline unsigned int atmci_ns_to_clocks(struct atmel_mci *host,
 					unsigned int ns)
 {
-	return (ns * (host->bus_hz / 1000000) + 999) / 1000;
+	/*
+	 * It is easier here to use us instead of ns for the timeout,
+	 * it prevents from overflows during calculation.
+	 */
+	unsigned int us = DIV_ROUND_UP(ns, 1000);
+
+	/* Maximum clock frequency is host->bus_hz/2 */
+	return us * (DIV_ROUND_UP(host->bus_hz, 2000000));
 }
 
 static void atmci_set_timeout(struct atmel_mci *host,
@@ -1944,12 +1951,12 @@ static bool atmci_filter(struct dma_chan *chan, void *slave)
 	}
 }
 
-static void atmci_configure_dma(struct atmel_mci *host)
+static bool atmci_configure_dma(struct atmel_mci *host)
 {
 	struct mci_platform_data	*pdata;
 
 	if (host == NULL)
-		return;
+		return false;
 
 	pdata = host->pdev->dev.platform_data;
 
@@ -1966,12 +1973,15 @@ static void atmci_configure_dma(struct atmel_mci *host)
 		host->dma.chan =
 			dma_request_channel(mask, atmci_filter, pdata->dma_slave);
 	}
-	if (!host->dma.chan)
-		dev_notice(&host->pdev->dev, "DMA not available, using PIO\n");
-	else
+	if (!host->dma.chan) {
+		dev_warn(&host->pdev->dev, "no DMA channel available\n");
+		return false;
+	} else {
 		dev_info(&host->pdev->dev,
 					"Using %s for DMA transfers\n",
 					dma_chan_name(host->dma.chan));
+		return true;
+	}
 }
 
 static inline unsigned int atmci_get_version(struct atmel_mci *host)
@@ -2081,8 +2091,7 @@ static int __init atmci_probe(struct platform_device *pdev)
 
 	/* Get MCI capabilities and set operations according to it */
 	atmci_get_cap(host);
-	if (host->caps.has_dma) {
-		dev_info(&pdev->dev, "using DMA\n");
+	if (host->caps.has_dma && atmci_configure_dma(host)) {
 		host->prepare_data = &atmci_prepare_data_dma;
 		host->submit_data = &atmci_submit_data_dma;
 		host->stop_transfer = &atmci_stop_transfer_dma;
@@ -2092,14 +2101,11 @@ static int __init atmci_probe(struct platform_device *pdev)
 		host->submit_data = &atmci_submit_data_pdc;
 		host->stop_transfer = &atmci_stop_transfer_pdc;
 	} else {
-		dev_info(&pdev->dev, "no DMA, no PDC\n");
+		dev_info(&pdev->dev, "using PIO\n");
 		host->prepare_data = &atmci_prepare_data;
 		host->submit_data = &atmci_submit_data;
 		host->stop_transfer = &atmci_stop_transfer;
 	}
-
-	if (host->caps.has_dma)
-		atmci_configure_dma(host);
 
 	platform_set_drvdata(pdev, host);
 

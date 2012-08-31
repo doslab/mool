@@ -1,6 +1,6 @@
 VERSION = 3
 PATCHLEVEL = 2
-SUBLEVEL = 9
+SUBLEVEL = 28
 EXTRAVERSION =
 NAME = Saber-toothed Squirrel
 
@@ -455,7 +455,7 @@ asm-generic:
 
 no-dot-config-targets := clean mrproper distclean \
 			 cscope gtags TAGS tags help %docs check% coccicheck \
-			 include/linux/version.h headers_% \
+			 include/linux/version.h headers_% archscripts \
 			 kernelversion %src-pkg
 
 config-targets := 0
@@ -1052,6 +1052,7 @@ endif
 prepare-crt: prepare1 $(crtobjects) $(cxx_headers)
 archprepare: prepare-crt scripts_basic 
 #prepare1 instead of prepare-crt in above line
+archprepare: archscripts prepare-crt scripts_basic
 
 prepare0: archprepare FORCE
 	$(Q)$(MAKE) $(build)=.
@@ -1118,8 +1119,11 @@ hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
 # If we do an all arch process set dst to asm-$(hdr-arch)
 hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
 
+PHONY += archscripts
+archscripts:
+
 PHONY += __headers
-__headers: include/linux/version.h scripts_basic asm-generic FORCE
+__headers: include/linux/version.h scripts_basic asm-generic archscripts FORCE
 	$(Q)$(MAKE) $(build)=scripts build_unifdef
 
 PHONY += headers_install_all
