@@ -88,9 +88,10 @@ int no_printk(const char *fmt, ...)
 	return 0;
 }
 
-extern asmlinkage __printf(1, 2)
-void early_printk(const char *fmt, ...);
 
+//extern 
+asmlinkage __attribute__ ((format (printf, 1, 2))) void early_printk(const char *fmt, ...);
+ 
 extern int printk_needs_cpu(int cpu);
 extern void printk_tick(void);
 

@@ -18,12 +18,17 @@ typedef u32 __ticketpair_t;
 #define TICKET_SHIFT	(sizeof(__ticket_t) * 8)
 #define TICKET_MASK	((__ticket_t)((1 << TICKET_SHIFT) - 1))
 
+struct __raw_tickets {
+  __ticket_t head, tail;
+};
+
 typedef struct arch_spinlock {
 	union {
 		__ticketpair_t head_tail;
-		struct __raw_tickets {
-			__ticket_t head, tail;
-		} tickets;
+		/* struct __raw_tickets { */
+		/* 	__ticket_t head, tail; */
+		/* } tickets; */
+	  struct __raw_tickets tickets;
 	};
 } arch_spinlock_t;
 

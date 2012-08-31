@@ -254,6 +254,20 @@ static bool each_symbol_in_section(const struct symsearch *arr,
 	return false;
 }
 
+ 
+struct find_symbol_arg {
+       /* Input */
+       const char *name;
+       bool gplok;
+       bool warn;
+
+       /* Output */
+       struct module *owner;
+       const unsigned long *crc;
+       struct kernel_symbol *sym;
+};
+
+
 /* Returns true as soon as fn returns true, otherwise false. */
 bool each_symbol_section(bool (*fn)(const struct symsearch *arr,
 				    struct module *owner,
@@ -308,22 +322,35 @@ bool each_symbol_section(bool (*fn)(const struct symsearch *arr,
 
 		if (each_symbol_in_section(arr, ARRAY_SIZE(arr), mod, fn, data))
 			return true;
+		#ifdef CONFIG_CXX_RUNTIME		
+		//and now the weak symbols!
+		if(mod->weak_symbols)
+		{
+			struct weak_symbol* it_weak_symbols= mod->weak_symbols;
+			struct find_symbol_arg *fsa = (struct find_symbol_arg *)data;
+	 		while(it_weak_symbols)
+			{
+				if (strcmp(it_weak_symbols->name, fsa->name) == 0) 
+				{				
+					if(fsa->sym == NULL)
+					{
+					fsa->sym = (struct kernel_symbol *)kmalloc(sizeof(struct kernel_symbol),GFP_KERNEL);
+						return false;
+					}
+					if(fsa->sym->name == NULL)
+						fsa->sym->name = kstrdup(it_weak_symbols->name,GFP_KERNEL);
+					fsa->sym->value = it_weak_symbols->value;
+
+					return true;
+		        	}
+				it_weak_symbols = it_weak_symbols->next;
+			}
+		}
+#endif	
 	}
 	return false;
 }
 EXPORT_SYMBOL_GPL(each_symbol_section);
-
-struct find_symbol_arg {
-	/* Input */
-	const char *name;
-	bool gplok;
-	bool warn;
-
-	/* Output */
-	struct module *owner;
-	const unsigned long *crc;
-	const struct kernel_symbol *sym;
-};
 
 static bool check_symbol(const struct symsearch *syms,
 				 struct module *owner,
@@ -1726,6 +1753,9 @@ void __weak module_arch_cleanup(struct module *mod)
 /* Free a module, remove from lists, etc. */
 static void free_module(struct module *mod)
 {
+	#ifdef CONFIG_CXX_RUNTIME	
+	 struct weak_symbol* weak_symbol;
+	#endif	
 	trace_module_free(mod);
 
 	/* Delete from various lists */
@@ -1740,6 +1770,19 @@ static void free_module(struct module *mod)
 	/* Arch-specific cleanup. */
 	module_arch_cleanup(mod);
 
+	#ifdef CONFIG_CXX_RUNTIME	
+	/* free the weak symbol stuff*/
+		weak_symbol = mod->weak_symbols;
+		while(weak_symbol!=0)
+		{
+			struct weak_symbol* next = weak_symbol->next;
+			//now delete the stuff
+			kfree(weak_symbol->name);
+			kfree(weak_symbol);
+			weak_symbol = next;
+		}
+	#endif	
+	
 	/* Module unload stuff */
 	module_unload_free(mod);
 
@@ -1822,6 +1865,13 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
 {
 	Elf_Shdr *symsec = &info->sechdrs[info->index.sym];
 	Elf_Sym *sym = (void *)symsec->sh_addr;
+
+	#ifdef CONFIG_CXX_RUNTIME	
+		Elf32_Addr	st_value=0;
+		struct weak_symbol* weak_symbol;
+    		const char* weak_symbol_name;
+	#endif
+
 	unsigned long secbase;
 	unsigned int i;
 	int ret = 0;
@@ -1869,7 +1919,51 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
 				secbase = (unsigned long)mod_percpu(mod);
 			else
 				secbase = info->sechdrs[sym[i].st_shndx].sh_addr;
-			sym[i].st_value += secbase;
+			#ifdef CONFIG_CXX_RUNTIME				
+				    if (ELF_ST_BIND(sym[i].st_info) == STB_WEAK)
+		                    {
+					//printk("Weak symbol: %s\n", info->strtab + sym[i].st_name);
+					//struct load_info temp_info;
+					//memcpy(&temp_info, info, sizeof(struct load_info));
+				
+				st_value = resolve_symbol_wait(mod, info, info->strtab + sym[i].st_name)->value;//      info->sechdrs, info->index.vers, info->strtab + sym[i].st_name, mod);
+    				//printk("Resolved symbol: %x\n",st_value);
+			    if(st_value==0)
+			    {
+			    	sym[i].st_value += secbase;
+			    	//printk("Putting default value of: %x into weak symbol map\n",sym[i].st_value );
+			    	//now insert to weak symbols linked list
+			    	weak_symbol = kmalloc(sizeof(struct weak_symbol), GFP_KERNEL);
+			    	weak_symbol->value=sym[i].st_value;
+			    	weak_symbol_name= info->strtab + sym[i].st_name;
+			    	{
+			    	  size_t symbol_name_length = strlen(weak_symbol_name);
+			    	  if(!symbol_name_length)
+			    	  {
+			    	  	 printk("Fatal Error: Zero symbol!\n");
+			    	  	 return -1;
+			    	  }
+			    	  weak_symbol->name = kmalloc(symbol_name_length,GFP_KERNEL);
+			    	}
+			    	
+			    	strcpy(weak_symbol->name,weak_symbol_name);
+			    	weak_symbol->next = mod->weak_symbols;
+			    	mod->weak_symbols = weak_symbol;
+			    }
+			    else
+			    {
+			        sym[i].st_value = st_value;
+			    }
+			}			
+			else
+			{
+			   sym[i].st_value += secbase;
+			}
+			#else
+				sym[i].st_value += secbase;
+			#endif
+			//sym[i].st_value += secbase;
+ 	
 			break;
 		}
 	}

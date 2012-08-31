@@ -144,6 +144,9 @@ SECTIONS
 		DATA_DATA
 		CONSTRUCTORS
 
+
+
+
 		/* rarely changed data like cpu maps */
 		READ_MOSTLY_DATA(INTERNODE_CACHE_BYTES)
 
@@ -334,8 +337,10 @@ SECTIONS
         DWARF_DEBUG
 
 	/* Sections to be discarded */
-	DISCARDS
-	/DISCARD/ : { *(.eh_frame) }
+
+      /*DISCARDS
+	/DISCARD/ : { *(.eh_frame) } */
+
 }
 
 

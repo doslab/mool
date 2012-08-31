@@ -104,6 +104,7 @@ modname_flags  = $(if $(filter 1,$(words $(modname))),\
 orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
 _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
+_cxx_flags     = $(KBUILD_CXXFLAGS) $(EXTRA_CXXFLAGS) $(KBUILD_CXXFLAGS_$(*F).o) $(KBUILD_CXXFLAGS_$(basetarget).o)
 _a_flags       = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
                  $(asflags-y) $(AFLAGS_$(basetarget).o)
 _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
@@ -140,6 +141,7 @@ else
 #   and locates generated .h files
 # FIXME: Replace both with specific CFLAGS* statements in the makefiles
 __c_flags	= $(call addtree,-I$(obj)) $(call flags,_c_flags)
+__cxx_flags     = $(call addtree,-I$(obj)) $(call flags,_cxx_flags)
 __a_flags	=                          $(call flags,_a_flags)
 __cpp_flags     =                          $(call flags,_cpp_flags)
 endif
@@ -147,6 +149,10 @@ endif
 c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
 		 $(__c_flags) $(modkern_cflags)                           \
 		 -D"KBUILD_STR(s)=\#s" $(basename_flags) $(modname_flags)
+
+cxx_flags      = -Wp,-MD,$(depfile) $(NOSTDINCXX_FLAGS) $(KBUILD_CPPFLAGS) \
+     		 $(__cxx_flags) $(modkern_cflags) \
+		 $(basename_flags) $(modname_flags)
 
 a_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
 		 $(__a_flags) $(modkern_aflags)

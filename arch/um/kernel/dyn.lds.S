@@ -115,6 +115,7 @@ SECTIONS
   .eh_frame       : { KEEP (*(.eh_frame)) }
   .gcc_except_table   : { *(.gcc_except_table) }
   .dynamic        : { *(.dynamic) }
+  .;
   .ctors          : {
     /* gcc uses crtbegin.o to find the start of
        the constructors, so we make sure it is
@@ -125,6 +126,7 @@ SECTIONS
        wildcard.  The wildcard also means that it
        doesn't matter which directory crtbegin.o
        is in.  */
+    //chk 1
     KEEP (*crtbegin.o(.ctors))
     /* We don't want to include the .ctor section from
        from the crtend.o file until after the sorted ctors.
@@ -132,6 +134,7 @@ SECTIONS
        end of ctors marker and it must be last */
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .ctors))
     KEEP (*(SORT(.ctors.*)))
+    KEEP (*(SORT(ctors.*)))
     KEEP (*(.ctors))
   }
   .dtors          : {

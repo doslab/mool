@@ -67,6 +67,14 @@ obj-$(CONFIG_GENERIC_ALLOCATOR) += genalloc.o
 obj-$(CONFIG_ZLIB_INFLATE) += zlib_inflate/
 obj-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate/
 obj-$(CONFIG_REED_SOLOMON) += reed_solomon/
+
+#obj-$(CONFIG_CXX_RUNTIME) += cxa_atexit.o
+#obj-$(CONFIG_CXX_RUNTIME) += gcc/
+#obj-$(CONFIG_CXX_RUNTIME) += libstdc++-v3/
+#obj-y += cxa_atexit.o
+#obj-y += gcc/
+#obj-y += libstdc++-v3/
+
 obj-$(CONFIG_BCH) += bch.o
 obj-$(CONFIG_LZO_COMPRESS) += lzo/
 obj-$(CONFIG_LZO_DECOMPRESS) += lzo/
@@ -112,6 +120,11 @@ obj-$(CONFIG_ATOMIC64_SELFTEST) += atomic64_test.o
 obj-$(CONFIG_AVERAGE) += average.o
 
 obj-$(CONFIG_CPU_RMAP) += cpu_rmap.o
+
+obj-$(CONFIG_CXX_RUNTIME) += cxa_atexit.o
+obj-$(CONFIG_CXX_RUNTIME) += gcc/
+obj-$(CONFIG_CXX_RUNTIME) += libstdc++-v3/
+
 
 obj-$(CONFIG_CORDIC) += cordic.o
 

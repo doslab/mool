@@ -44,6 +44,10 @@
 #include <linux/debugobjects.h>
 #include <linux/compiler.h>
 
+#ifdef __cplusplus
+#define __builtin_constant_p(offset) 1
+#endif
+
 #ifdef CONFIG_RCU_TORTURE_TEST
 extern int rcutorture_runnable; /* for sysctl */
 #endif /* #ifdef CONFIG_RCU_TORTURE_TEST */
@@ -209,7 +213,9 @@ void wait_rcu_gp(call_rcu_func_t crf);
 #elif defined(CONFIG_TINY_RCU) || defined(CONFIG_TINY_PREEMPT_RCU)
 #include <linux/rcutiny.h>
 #else
-#error "Unknown RCU implementation specified to kernel configuration"
+//#error "Unknown RCU implementation specified to kernel configuration"
+#include <linux/rcutree.h>
++
 #endif
 
 /*

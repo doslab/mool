@@ -64,6 +64,7 @@ static const struct {
 	[SYM_STRUCT]     = {'s', "struct"},
 	[SYM_UNION]      = {'u', "union"},
 	[SYM_ENUM_CONST] = {'E', "enum constant"},
+	[SYM_CLASS]	 = {'c', "class"}
 };
 
 static int equal_list(struct string_list *a, struct string_list *b);
@@ -592,6 +593,7 @@ static unsigned long expand_and_crc_sym(struct symbol *sym, unsigned long crc)
 		case SYM_STRUCT:
 		case SYM_UNION:
 		case SYM_ENUM:
+		case SYM_CLASS: /* SYM_CLASS added */
 			subsym = find_symbol(cur->string, cur->tag, 0);
 			if (!subsym) {
 				struct string_list *n;

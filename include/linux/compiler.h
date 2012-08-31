@@ -48,7 +48,11 @@ extern void __chk_io_ptr(const volatile void __iomem *);
 #include <linux/compiler-gcc.h>
 #endif
 
+#ifdef __cplusplus
+#define notrace
+#else
 #define notrace __attribute__((no_instrument_function))
+#endif
 
 /* Intel compiler defines __GNUC__. So we will overwrite implementations
  * coming from above header files here
@@ -307,5 +311,4 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
  * handlers, all running on the same CPU.
  */
 #define ACCESS_ONCE(x) (*(volatile typeof(x) *)&(x))
-
 #endif /* __LINUX_COMPILER_H */
