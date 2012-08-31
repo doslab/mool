@@ -1,0 +1,12 @@
+#ifndef LINUX_CLIMITS_INCLUDED
+#define LINUX_CLIMITS_INCLUDED
+
+#include <linux/kernel.h>
+
+#undef INT_MAX
+#define INT_MAX __INT_MAX__
+
+#undef LONG_MAX
+#define LONG_MAX __LONG_MAX__
+
+#endif

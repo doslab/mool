@@ -1,0 +1,18 @@
+#ifndef LINUX_CSTRING_INCLUDED
+#define LINUX_CSTRING_INCLUDED
+
+#include <asm/string.h>
+
+namespace std {
+   extern "C" inline void* cxx_memset(void* dst, const void* src, size_t sz)
+   {
+      return memset(dst, src, sz);
+   }
+}
+
+using std::cxx_memset;
+
+#undef memset
+#define memset cxx_memset
+
+#endif

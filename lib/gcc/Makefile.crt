@@ -1,0 +1,23 @@
+# -*- Makefile -*- for crtstuff.c
+#
+
+EXTRA_CFLAGS	+= $(LIBGCC_CFLAGS) -finhibit-size-directive \
+	-fno-inline-functions -fno-exceptions
+EXTRA_CFLAGS	+= $(call check_gcc,-fno-zero-initialized-in-bss,)
+
+CFLAGS_crtbegin.o := -DCRT_BEGIN
+CFLAGS_crtend.o := -DCRT_END
+CFLAGS_crtbeginM.o := -DCRT_BEGIN -DMODULE -DCRTSTUFFS_O
+CFLAGS_crtendM.o := -DCRT_END -DMODULE -DCRTSTUFFS_O
+
+$(obj)/crtbegin.o:	$(src)/crtstuff.c
+	$(call if_changed_rule,cc_o_c)
+
+$(obj)/crtend.o:	$(src)/crtstuff.c
+	$(call if_changed_rule,cc_o_c)
+
+$(obj)/crtbeginM.o:	$(src)/crtstuff.c
+	$(call if_changed_rule,cc_o_c)
+
+$(obj)/crtendM.o:	$(src)/crtstuff.c
+	$(call if_changed_rule,cc_o_c)
