@@ -41,7 +41,7 @@ info()
 # ${1} output file
 modpost_link()
 {
-	${LD} ${LDFLAGS} -r -o ${1} ${KBUILD_VMLINUX_INIT}                   \
+	${LD} ${LDFLAGS} -r -o ${1} ${KBUILD_VMLINUX_INIT}                  \
 		--start-group ${KBUILD_VMLINUX_MAIN} --end-group
 }
 
@@ -55,7 +55,10 @@ vmlinux_link()
 	if [ "${SRCARCH}" != "um" ]; then
 		${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2}                  \
 			-T ${lds} ${KBUILD_VMLINUX_INIT}                     \
-			--start-group ${KBUILD_VMLINUX_MAIN} --end-group ${1}
+			lib/gcc/crtbegin.o				     \
+			--start-group ${KBUILD_VMLINUX_MAIN} --end-group ${1}\
+                        lib/gcc/crtend.o
+
 	else
 		${CC} ${CFLAGS_vmlinux} -o ${2}                              \
 			-Wl,-T,${lds} ${KBUILD_VMLINUX_INIT}                 \

@@ -66,8 +66,12 @@ static __always_inline void __ticket_spin_lock(arch_spinlock_t *lock)
 static __always_inline int __ticket_spin_trylock(arch_spinlock_t *lock)
 {
 	arch_spinlock_t old, new;
-
-	old.tickets = ACCESS_ONCE(lock->tickets);
+        #ifdef __cplusplus 
+        #define ACCESS_ONCE_N(x) dynamic_cast<volatile typeof(x) &>(x) 
+        old.tickets = ACCESS_ONCE_N(lock->tickets);
+        #else
+        old.tickets = ACCESS_ONCE(lock->tickets);
+        #endif
 	if (old.tickets.head != old.tickets.tail)
 		return 0;
 
@@ -84,14 +88,24 @@ static __always_inline void __ticket_spin_unlock(arch_spinlock_t *lock)
 
 static inline int __ticket_spin_is_locked(arch_spinlock_t *lock)
 {
-	struct __raw_tickets tmp = ACCESS_ONCE(lock->tickets);
+        #ifdef __cplusplus 
+        #define ACCESS_ONCE_N(x) dynamic_cast<volatile typeof(x) &>(x)
+        struct __raw_tickets tmp = ACCESS_ONCE_N(lock->tickets);
+        #else
+        struct __raw_tickets tmp = ACCESS_ONCE(lock->tickets);
+        #endif
 
 	return tmp.tail != tmp.head;
 }
 
 static inline int __ticket_spin_is_contended(arch_spinlock_t *lock)
 {
-	struct __raw_tickets tmp = ACCESS_ONCE(lock->tickets);
+        #ifdef __cplusplus 
+        #define ACCESS_ONCE_N(x) dynamic_cast<volatile typeof(x) &>(x)
+        struct __raw_tickets tmp = ACCESS_ONCE_N(lock->tickets);
+        #else
+        struct __raw_tickets tmp = ACCESS_ONCE(lock->tickets);
+        #endif
 
 	return (__ticket_t)(tmp.tail - tmp.head) > 1;
 }

@@ -19,8 +19,8 @@ extern const char VDSO32_PRELINK[];
  * These symbols are defined with the addresses in the vsyscall page.
  * See vsyscall-sigreturn.S.
  */
-extern void __user __kernel_sigreturn;
-extern void __user __kernel_rt_sigreturn;
+extern int __user __kernel_sigreturn;
+extern int __user __kernel_rt_sigreturn;
 
 /*
  * These symbols are defined by vdso32.S to mark the bounds
