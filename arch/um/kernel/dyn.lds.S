@@ -101,6 +101,7 @@ SECTIONS
   .preinit_array     : { *(.preinit_array) }
   .init_array     : { *(.init_array) }
   .fini_array     : { *(.fini_array) }
+
   .data           : {
     INIT_TASK_DATA(KERNEL_STACK_SIZE)
     . = ALIGN(KERNEL_STACK_SIZE);
@@ -109,12 +110,15 @@ SECTIONS
     *(.data.* .gnu.linkonce.d.*)
     SORT(CONSTRUCTORS)
   }
-  .data1          : { *(.data1) }
+
   .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
   .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
   .eh_frame       : { KEEP (*(.eh_frame)) }
   .gcc_except_table   : { *(.gcc_except_table) }
   .dynamic        : { *(.dynamic) }
+  .;
+  
+
   .ctors          : {
     /* gcc uses crtbegin.o to find the start of
        the constructors, so we make sure it is
@@ -131,7 +135,7 @@ SECTIONS
        The .ctor section from the crtend file contains the
        end of ctors marker and it must be last */
     KEEP (*(EXCLUDE_FILE (*crtend.o ) .ctors))
-    KEEP (*(SORT(.ctors.*)))
+    KEEP (*(SORT(ctors.*)))
     KEEP (*(.ctors))
   }
   .dtors          : {

@@ -203,6 +203,15 @@ enum module_state
 	MODULE_STATE_GOING,
 };
 
+#ifdef CONFIG_CXX_RUNTIME	
+struct weak_symbol
+{
+	 unsigned long value;
+     char *name;
+     struct weak_symbol* next;
+};
+#endif
+
 /**
  * struct module_ref - per cpu module reference counts
  * @incs: number of module get on this cpu
@@ -366,6 +375,10 @@ struct module
 	/* Constructor functions. */
 	ctor_fn_t *ctors;
 	unsigned int num_ctors;
+#endif
+#ifdef CONFIG_CXX_RUNTIME	
+	//weak symbols
+	struct weak_symbol* weak_symbols;
 #endif
 };
 #ifndef MODULE_ARCH_INIT

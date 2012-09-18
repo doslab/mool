@@ -37,6 +37,7 @@
 
 %}
 
+EXTERN_C		extern[ \t]+\"C\"
 IDENT			[A-Za-z_\$][A-Za-z0-9_\$]*
 
 O_INT			0[0-7]*
@@ -71,7 +72,7 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
  /* Ignore all other whitespace.  */
 [ \t\f\v\r]+				;
 
-
+{EXTERN_C}				;
 {STRING}				return STRING;
 {CHAR}					return CHAR;
 {IDENT}					return IDENT;
@@ -85,6 +86,7 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
 {REAL}					return REAL;
 
 "..."					return DOTS;
+"::"					return SCOPERES;
 
  /* All other tokens are single characters.  */
 .					return yytext[0];
@@ -125,13 +127,16 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
 /* The second stage lexer.  Here we incorporate knowledge of the state
    of the parser to tailor the tokens that are returned.  */
 
+/* Added by RM */
+int prev_token;
+
 int
 yylex(void)
 {
   static enum {
     ST_NOTSTARTED, ST_NORMAL, ST_ATTRIBUTE, ST_ASM, ST_BRACKET, ST_BRACE,
     ST_EXPRESSION, ST_TABLE_1, ST_TABLE_2, ST_TABLE_3, ST_TABLE_4,
-    ST_TABLE_5, ST_TABLE_6
+    ST_TABLE_5, ST_TABLE_6,  ST_ACCESS_SPEC , ST_BASE_CLASS
   } lexstate = ST_NOTSTARTED;
 
   static int suppress_type_lookup, dont_want_brace_phrase;
@@ -198,10 +203,16 @@ repeat:
 		    lexstate = ST_ASM;
 		    count = 0;
 		    goto repeat;
+		
+		/* ACCESS_SPEC_KEYW: Added by Ravi Manohar */
+		  case ACCESS_SPEC_KEYW:
+			lexstate = ST_ACCESS_SPEC;
+			break;
 
 		  case STRUCT_KEYW:
 		  case UNION_KEYW:
 		  case ENUM_KEYW:
+		  case CLASS_KEYW:  /* Added by RM */
 		    dont_want_brace_phrase = 3;
 		    suppress_type_lookup = 2;
 		    goto fini;
@@ -236,6 +247,11 @@ repeat:
 	  APP;
 	  lexstate = ST_EXPRESSION;
 	  break;
+
+	/* SCOPERES Added by RM */
+	case SCOPERES:	
+		APP;      
+		break;
 
 	case DOTS:
 	default:
@@ -418,6 +434,26 @@ repeat:
 	  break;
 	}
       break;
+
+	/* ST_ACCESS_SPEC Added by RM */
+	case ST_ACCESS_SPEC:
+		switch (token)
+		{
+			case ':':
+				APP;					
+				lexstate = ST_NORMAL;					
+				break;
+			case IDENT:
+	   			dont_want_brace_phrase = 2;
+	   			suppress_type_lookup = 1;  
+	   			/* FALLTHRU */		   					   			 
+			default:				
+				APP;
+				lexstate = ST_NORMAL;	
+				break; //goto fini for reserved word,break for ident
+		}
+		break;
+
 
     default:
       exit(1);

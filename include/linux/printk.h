@@ -88,8 +88,8 @@ int no_printk(const char *fmt, ...)
 	return 0;
 }
 
-extern asmlinkage __printf(1, 2)
-void early_printk(const char *fmt, ...);
+//extern 
+asmlinkage __printf(1, 2) void early_printk(const char *fmt, ...);
 
 extern int printk_needs_cpu(int cpu);
 extern void printk_tick(void);
@@ -104,7 +104,7 @@ asmlinkage __printf(1, 0)
 int vprintk(const char *fmt, va_list args);
 
 asmlinkage __printf(5, 6) __cold
-asmlinkage int printk_emit(int facility, int level,
+int printk_emit(int facility, int level,
 			   const char *dict, size_t dictlen,
 			   const char *fmt, ...);
 

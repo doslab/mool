@@ -1,4 +1,4 @@
-#include <asm/unistd_32.h>
+#include <../../../arch/sh/include/asm/unistd_32.h>
 
 unsigned ia32_dir_class[] = {
 #include <asm-generic/audit_dir_write.h>
