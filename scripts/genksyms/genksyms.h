@@ -27,7 +27,7 @@
 
 enum symbol_type {
 	SYM_NORMAL, SYM_TYPEDEF, SYM_ENUM, SYM_STRUCT, SYM_UNION,
-	SYM_ENUM_CONST
+	SYM_ENUM_CONST, SYM_CLASS /* SYM_CLASS added by RM */
 };
 
 enum symbol_status {

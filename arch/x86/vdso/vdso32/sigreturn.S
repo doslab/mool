@@ -7,7 +7,7 @@
  */
 
 #include <linux/linkage.h>
-#include <asm/unistd_32.h>
+#include <../../../arch/sh/include/asm/unistd_32.h>
 #include <asm/asm-offsets.h>
 
 #ifndef SYSCALL_ENTER_KERNEL

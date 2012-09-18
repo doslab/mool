@@ -64,6 +64,7 @@ static const struct {
 	[SYM_STRUCT]     = {'s', "struct"},
 	[SYM_UNION]      = {'u', "union"},
 	[SYM_ENUM_CONST] = {'E', "enum constant"},
+	[SYM_CLASS]	 = {'c', "class"}
 };
 
 static int equal_list(struct string_list *a, struct string_list *b);
@@ -158,6 +159,7 @@ static enum symbol_type map_to_ns(enum symbol_type t)
 		return SYM_NORMAL;
 	case SYM_ENUM:
 	case SYM_STRUCT:
+	case SYM_CLASS: /* SYM_CLASS added by RM */
 	case SYM_UNION:
 		return SYM_STRUCT;
 	}

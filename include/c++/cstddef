@@ -1,0 +1,18 @@
+// -*- C++ -*-
+
+#ifndef __cplusplus
+#error "This file is only for C++"
+#endif
+
+#ifndef LINUX_CSTDDEF_INCLUDED
+#define LINUX_CSTDDEF_INCLUDED
+
+#include <begin_include.h>
+#include <linux/types.h>
+#include <end_include.h>
+
+namespace std {
+   using ::size_t;
+}
+
+#endif
