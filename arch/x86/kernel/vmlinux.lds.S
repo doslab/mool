@@ -142,6 +142,7 @@ SECTIONS
 		CACHELINE_ALIGNED_DATA(L1_CACHE_BYTES)
 
 		DATA_DATA
+
 		CONSTRUCTORS
 
 		/* rarely changed data like cpu maps */
@@ -322,8 +323,8 @@ SECTIONS
         DWARF_DEBUG
 
 	/* Sections to be discarded */
-	DISCARDS
-	/DISCARD/ : { *(.eh_frame) }
+	/*DISCARDS
+	/DISCARD/ : { *(.eh_frame) } */
 }
 
 

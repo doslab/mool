@@ -25,7 +25,7 @@
  *  2007-11-29  RT balancing improvements by Steven Rostedt, Gregory Haskins,
  *              Thomas Gleixner, Mike Kravetz
  */
-
+#include <c++/begin_include.h>
 #include <linux/mm.h>
 #include <linux/module.h>
 #include <linux/nmi.h>
@@ -87,7 +87,7 @@
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
-
+#include <c++/end_include.h>
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
 	unsigned long delta;
