@@ -1,0 +1,21 @@
+Version 3.5.4
+--------------
+unistd_32.h path changed in arch/x86/include/asm/unistd.h
+Enabled Slab instead of stub
+Disabled CONFIG_AUDIT
+Enabled CONFIG_RCU_TRACE
+
+Version 3.5.3
+--------------
+unistd_32.h path changed in arch/x86/include/asm/unistd.h
+Enabled Slab instead of stub
+Disabled CONFIG_AUDIT
+Enabled CONFIG_RCU_TRACE
+
+Version 3.5.2
+--------------
+unistd_32.h path changed in arch/x86/include/asm/unistd.h
+Enabled Slab instead of stub
+Disabled CONFIG_AUDIT
+Enabled CONFIG_RCU_TRACE
+
