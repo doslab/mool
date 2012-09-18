@@ -27,6 +27,7 @@ __volatile, VOLATILE_KEYW
 __volatile__, VOLATILE_KEYW
 # According to rth, c99 defines _Bool, __restrict, __restrict__, restrict.  KAO
 _Bool, BOOL_KEYW
+bool, BOOL_KEYW
 _restrict, RESTRICT_KEYW
 __restrict__, RESTRICT_KEYW
 restrict, RESTRICT_KEYW
@@ -57,3 +58,10 @@ void, VOID_KEYW
 volatile, VOLATILE_KEYW
 typeof, TYPEOF_KEYW
 __typeof__, TYPEOF_KEYW
+virtual, VIRTUAL_KEYW
+friend, FRIEND_KEYW
+wchar_t, WCHAR_KEYW
+class, CLASS_KEYW
+private, ACCESS_SPEC_KEYW
+protected, ACCESS_SPEC_KEYW
+public, ACCESS_SPEC_KEYW
