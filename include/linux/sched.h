@@ -197,8 +197,12 @@ print_cfs_rq(struct seq_file *m, int cpu, struct cfs_rq *cfs_rq)
 
 #define TASK_STATE_TO_CHAR_STR "RSDTtZXxKW"
 
+#ifndef __cplusplus
 extern char ___assert_task_state[1 - 2*!!(
 		sizeof(TASK_STATE_TO_CHAR_STR)-1 != ilog2(TASK_STATE_MAX)+1)];
+#else
+extern char ___assert_task_state[1];
+#endif
 
 /* Convenience macros for the sake of set_task_state */
 #define TASK_KILLABLE		(TASK_WAKEKILL | TASK_UNINTERRUPTIBLE)
@@ -266,7 +270,8 @@ extern int lockdep_tasklist_lock_is_held(void);
 
 extern void sched_init(void);
 extern void sched_init_smp(void);
-extern asmlinkage void schedule_tail(struct task_struct *prev);
+//extern 
+asmlinkage void schedule_tail(struct task_struct *prev);
 extern void init_idle(struct task_struct *idle, int cpu);
 extern void init_idle_bootup_task(struct task_struct *idle);
 
@@ -1578,6 +1583,13 @@ struct task_struct {
 #endif
 #ifdef CONFIG_HAVE_HW_BREAKPOINT
 	atomic_t ptrace_bp_refcnt;
+#endif
+#ifdef CONFIG_CXX_RUNTIME
+ 	/* Copied from unwind-cxx.h */
+ 	struct {
+ 		void *caughtExceptions;
+ 		unsigned int uncaughtExceptions;
+ 	} cxa_eh_globals;
 #endif
 #ifdef CONFIG_UPROBES
 	struct uprobe_task *utask;

@@ -1479,6 +1479,15 @@ config PROFILING
 config TRACEPOINTS
 	bool
 
+config CXX_RUNTIME
+        bool "C++ runtime support"
+        default y
+
+config CXX_RUNTIME_TEST
+        tristate "Tests for C++ runtime support"
+        depends on CXX_RUNTIME
+        default m
+
 source "arch/Kconfig"
 
 endmenu		# General setup

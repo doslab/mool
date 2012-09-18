@@ -146,8 +146,8 @@ static inline unsigned int cpumask_any_but(const struct cpumask *mask,
 	for ((cpu) = 0; (cpu) < 1; (cpu)++, (void)mask)
 #define for_each_cpu_not(cpu, mask)		\
 	for ((cpu) = 0; (cpu) < 1; (cpu)++, (void)mask)
-#define for_each_cpu_and(cpu, mask, and)	\
-	for ((cpu) = 0; (cpu) < 1; (cpu)++, (void)mask, (void)and)
+#define for_each_cpu_and(cpu, mask, and_id)	\
+	for ((cpu) = 0; (cpu) < 1; (cpu)++, (void)mask, (void)and_id)
 #else
 /**
  * cpumask_first - get the first cpu in a cpumask
@@ -212,9 +212,9 @@ int cpumask_any_but(const struct cpumask *mask, unsigned int cpu);
  *
  * After the loop, cpu is >= nr_cpu_ids.
  */
-#define for_each_cpu_not(cpu, mask)				\
+#define for_each_cpu_not(cpu, mask)			\
 	for ((cpu) = -1;					\
-		(cpu) = cpumask_next_zero((cpu), (mask)),	\
+		(cpu) = cpumask_next_and((cpu), (mask)),		\
 		(cpu) < nr_cpu_ids;)
 
 /**
@@ -231,9 +231,9 @@ int cpumask_any_but(const struct cpumask *mask, unsigned int cpu);
  *
  * After the loop, cpu is >= nr_cpu_ids.
  */
-#define for_each_cpu_and(cpu, mask, and)				\
+#define for_each_cpu_and(cpu, mask, and_var)				\
 	for ((cpu) = -1;						\
-		(cpu) = cpumask_next_and((cpu), (mask), (and)),		\
+		(cpu) = cpumask_next_and((cpu), (mask), (and_var)),		\
 		(cpu) < nr_cpu_ids;)
 #endif /* SMP */
 
